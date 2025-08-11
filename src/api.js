@@ -1,4 +1,4 @@
-import cheerio from 'cheerio';
+import { load } from 'cheerio';
 import { BASE_URL, BROWSE_URL, DETAIL_URL, IMAGE_URL, WATCH_URL, SEARCH_URL, GENRE_URL, GENRES, JIKAN_URL  } from './util/urls.js';
 import axios from 'axios';
 
@@ -7,7 +7,7 @@ const latestEpisodesAdded = async() =>{
   if(res.status !== 200) throw new Error('Failed to fetch latest episodes');
   if(!res.data) throw new Error('No data received from the server');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const promises = [];
   $('#tioanime > div > section:nth-child(1) > ul > li').each((index , element) =>{
     const $element = $(element);
@@ -35,7 +35,7 @@ const latestAnime = async() =>{
     const res = await axios.get(`${BROWSE_URL}&p=${i}`, {method: 'GET'});
     if(res.status !== 200) throw new Error('Failed to fetch latest anime');
     const body = await res;
-    const $ = cheerio.load(body);
+    const $ = load(body);
     $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
       const $element = $(element);
       const id = $element.find('article a').attr('href').replace('/anime/', '');
@@ -58,7 +58,7 @@ const latestAnimeDetail = async() =>{
     const res = await axios.get(`${BROWSE_URL}&p=${i}`, {method: 'GET'});
     if(res.status !== 200) throw new Error('Failed to fetch latest anime details');
     const body = await res;
-    const $ = cheerio.load(body);
+    const $ = load(body);
     $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
       const $element = $(element);
       const id = $element.find('article a').attr('href').replace('/anime/', '');
@@ -72,7 +72,7 @@ const getAnimeInfo = async(id) =>{
   const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch anime info');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const promises = [];
 
   const title = $('#tioanime > article > div > div > aside.col.col-sm-8.col-lg-9.col-xl-10 > h1.title').text();
@@ -124,7 +124,7 @@ const getAnimeRelated = async(id) =>{
   const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch related anime');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const promises = [];
   
   $('#tioanime > div > div > aside.sidebar.col-12 > div > section > ul > li').each((index , element) =>{
@@ -147,7 +147,7 @@ const getAnimeEpisodes = async(id) =>{
   if(res.status !== 200) throw new Error('Failed to fetch anime episodes');
   const body = await res;
   const promises = [];
-  const $ = cheerio.load(body , {xmlMode: false});
+  const $ = load(body , {xmlMode: false});
   $('body > script:nth-child(21)').map((i, x) => x.children[0])
     .filter((i, x) => {
       const info =  x && JSON.parse(x.data.match(/var anime_info = (\[.*?\])/)[1]);
@@ -173,7 +173,7 @@ const getAnimeEpisodeServers = async(id, episode) =>{
   const res = await axios.get(`${WATCH_URL}${id}-${episode}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch anime episode servers');
   const body = await res;
-  const $ = cheerio.load(body , {xmlMode: false});
+  const $ = load(body , {xmlMode: false});
   const promises = [];
 
   var textNode = $('body > script')
@@ -195,7 +195,7 @@ const downloadAnimeEpisode = async(id, episode) =>{
   const res = await axios.get(`${WATCH_URL}${id}-${episode}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch download links');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const promises = [];
   $('#downloads > div > div > div.modal-body > div > table > tbody > tr').each((index , element) =>{
     const $element = $(element);
@@ -214,7 +214,7 @@ const search = async(query) =>{
   const res = await axios.get(`${SEARCH_URL}${query.replace(/ /g, '+')}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch search results');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const promises = [];
 
   $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
@@ -236,7 +236,7 @@ const searchDetail = async(query) =>{
   const res = await axios.get(`${SEARCH_URL}${query.replace(/ /g, '+')}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch search details');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   const promises = [];
 
   $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
@@ -253,7 +253,7 @@ const getByGenre = async(genre, page) =>{
   const res = await axios.get(`${GENRE_URL}${GENRES[genre]}&year=1950%2C2021&status=2&sort=recent&p=${page}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch genre anime');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
     const $element = $(element);
     const id = $element.find('article a').attr('href').replace('/anime/','');
@@ -275,7 +275,7 @@ const getByGenreDetail = async(genre, page) =>{
   const res = await axios.get(`${GENRE_URL}${GENRES[genre]}&year=1950%2C2021&status=2&sort=recent&p=${page}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch genre anime details');
   const body = await res;
-  const $ = cheerio.load(body);
+  const $ = load(body);
   $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
     const $element = $(element);
     const id = $element.find('article a').attr('href').replace('/anime/','');
@@ -290,7 +290,7 @@ const getAnimeExtraInfo = async(id) =>{
   const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch anime extra info');
   const bodyId = await res;
-  const $ = cheerio.load(bodyId);
+  const $ = load(bodyId);
   let malId;
   $('body > script:nth-child(20)').map((i, x) => x.children[0])
     .filter((i, x) => {
@@ -346,7 +346,7 @@ const getAnimeEpisodesTitles = async(id) =>{
   const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch anime episodes titles');
   const bodyId = await res;
-  const $ = cheerio.load(bodyId);
+  const $ = load(bodyId);
   let malId;
   $('body > script:nth-child(20)').map((i, x) => x.children[0])
     .filter((i, x) => {
@@ -375,7 +375,7 @@ const getAnimeCharacters = async(id) =>{
   const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
   if(res.status !== 200) throw new Error('Failed to fetch anime characters');
   const bodyId = await res;
-  const $ = cheerio.load(bodyId);
+  const $ = load(bodyId);
   let malId;
   $('body > script:nth-child(20)').map((i, x) => x.children[0])
     .filter((i, x) => {
