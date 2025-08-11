@@ -1,10 +1,11 @@
-const cheerio = require('cheerio');
-const cloudscraper = require('cloudscraper');
-const {BASE_URL, BROWSE_URL, DETAIL_URL, IMAGE_URL,
-  WATCH_URL, SEARCH_URL, GENRE_URL, GENRES, JIKAN_URL} = require('./util/urls')
+import cheerio from 'cheerio';
+import { BASE_URL, BROWSE_URL, DETAIL_URL, IMAGE_URL, WATCH_URL, SEARCH_URL, GENRE_URL, GENRES, JIKAN_URL  } from './util/urls.js';
+import axios from 'axios';
 
 const latestEpisodesAdded = async() =>{
-  const res = await cloudscraper(BASE_URL , {method: 'GET'});
+  const res = await axios.get(BASE_URL, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch latest episodes');
+  if(!res.data) throw new Error('No data received from the server');
   const body = await res;
   const $ = cheerio.load(body);
   const promises = [];
@@ -31,7 +32,8 @@ const latestEpisodesAdded = async() =>{
 const latestAnime = async() =>{
   const promises = [];
   for(let i=1; i<5; i++){
-    const res = await cloudscraper(`${BROWSE_URL}&p=${i}` , {method: 'GET'});
+    const res = await axios.get(`${BROWSE_URL}&p=${i}`, {method: 'GET'});
+    if(res.status !== 200) throw new Error('Failed to fetch latest anime');
     const body = await res;
     const $ = cheerio.load(body);
     $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
@@ -53,7 +55,8 @@ const latestAnime = async() =>{
 const latestAnimeDetail = async() =>{
   const promises = [];
   for(let i=1; i<5; i++){
-    const res = await cloudscraper(`${BROWSE_URL}&p=${i}` , {method: 'GET'});
+    const res = await axios.get(`${BROWSE_URL}&p=${i}`, {method: 'GET'});
+    if(res.status !== 200) throw new Error('Failed to fetch latest anime details');
     const body = await res;
     const $ = cheerio.load(body);
     $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
@@ -66,7 +69,8 @@ const latestAnimeDetail = async() =>{
 };
 
 const getAnimeInfo = async(id) =>{
-  const res = await cloudscraper(`${DETAIL_URL}${id}` , {method: 'GET'});
+  const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch anime info');
   const body = await res;
   const $ = cheerio.load(body);
   const promises = [];
@@ -117,7 +121,8 @@ const getAnimeInfo = async(id) =>{
 };
 
 const getAnimeRelated = async(id) =>{
-  const res = await cloudscraper(`${DETAIL_URL}${id}` , {method: 'GET'});
+  const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch related anime');
   const body = await res;
   const $ = cheerio.load(body);
   const promises = [];
@@ -138,7 +143,8 @@ const getAnimeRelated = async(id) =>{
 };
 
 const getAnimeEpisodes = async(id) =>{
-  const res = await cloudscraper(`${DETAIL_URL}${id}` , {method: 'GET'});
+  const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch anime episodes');
   const body = await res;
   const promises = [];
   const $ = cheerio.load(body , {xmlMode: false});
@@ -164,7 +170,8 @@ const getAnimeEpisodes = async(id) =>{
 };
 
 const getAnimeEpisodeServers = async(id, episode) =>{
-  const res = await cloudscraper(`${WATCH_URL}${id}-${episode}` , {method: 'GET'});
+  const res = await axios.get(`${WATCH_URL}${id}-${episode}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch anime episode servers');
   const body = await res;
   const $ = cheerio.load(body , {xmlMode: false});
   const promises = [];
@@ -185,7 +192,8 @@ const getAnimeEpisodeServers = async(id, episode) =>{
 };
 
 const downloadAnimeEpisode = async(id, episode) =>{
-  const res = await cloudscraper(`${WATCH_URL}${id}-${episode}` , {method: 'GET'});
+  const res = await axios.get(`${WATCH_URL}${id}-${episode}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch download links');
   const body = await res;
   const $ = cheerio.load(body);
   const promises = [];
@@ -203,7 +211,8 @@ const downloadAnimeEpisode = async(id, episode) =>{
 };
 
 const search = async(query) =>{
-  const res = await cloudscraper(`${SEARCH_URL}${query.replace(/ /g, '+')}` , {method: 'GET'});
+  const res = await axios.get(`${SEARCH_URL}${query.replace(/ /g, '+')}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch search results');
   const body = await res;
   const $ = cheerio.load(body);
   const promises = [];
@@ -224,7 +233,8 @@ const search = async(query) =>{
 };
 
 const searchDetail = async(query) =>{
-  const res = await cloudscraper(`${SEARCH_URL}${query.replace(/ /g, '+')}` , {method: 'GET'});
+  const res = await axios.get(`${SEARCH_URL}${query.replace(/ /g, '+')}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch search details');
   const body = await res;
   const $ = cheerio.load(body);
   const promises = [];
@@ -240,7 +250,8 @@ const searchDetail = async(query) =>{
 
 const getByGenre = async(genre, page) =>{
   const promises = [];
-  const res = await cloudscraper(`${GENRE_URL}${GENRES[genre]}&year=1950%2C2021&status=2&sort=recent&p=${page}` , {method: 'GET'});
+  const res = await axios.get(`${GENRE_URL}${GENRES[genre]}&year=1950%2C2021&status=2&sort=recent&p=${page}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch genre anime');
   const body = await res;
   const $ = cheerio.load(body);
   $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
@@ -261,7 +272,8 @@ const getByGenre = async(genre, page) =>{
 
 const getByGenreDetail = async(genre, page) =>{
   const promises = [];
-  const res = await cloudscraper(`${GENRE_URL}${GENRES[genre]}&year=1950%2C2021&status=2&sort=recent&p=${page}` , {method: 'GET'});
+  const res = await axios.get(`${GENRE_URL}${GENRES[genre]}&year=1950%2C2021&status=2&sort=recent&p=${page}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch genre anime details');
   const body = await res;
   const $ = cheerio.load(body);
   $('#tioanime > div > div.row.justify-content-between.filters-cont > main > ul > li').each((index , element) =>{
@@ -275,7 +287,8 @@ const getByGenreDetail = async(genre, page) =>{
 };
 
 const getAnimeExtraInfo = async(id) =>{
-  const res = await cloudscraper(`${DETAIL_URL}${id}` , {method: 'GET'});
+  const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch anime extra info');
   const bodyId = await res;
   const $ = cheerio.load(bodyId);
   let malId;
@@ -286,7 +299,7 @@ const getAnimeExtraInfo = async(id) =>{
   });
 
   const animeDetails = `${JIKAN_URL}${malId}`;
-  const data = await cloudscraper.get(animeDetails);
+  const data = await axios.get(animeDetails);
   const body = Array(JSON.parse(data));
   const promises = [];
   
@@ -330,7 +343,8 @@ const getAnimeExtraInfo = async(id) =>{
 };
 
 const getAnimeEpisodesTitles = async(id) =>{
-  const res = await cloudscraper(`${DETAIL_URL}${id}` , {method: 'GET'});
+  const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch anime episodes titles');
   const bodyId = await res;
   const $ = cheerio.load(bodyId);
   let malId;
@@ -341,7 +355,7 @@ const getAnimeEpisodesTitles = async(id) =>{
   });
 
   const jikanEpisodesURL = `${JIKAN_URL}${malId}/episodes`;
-  const data = await cloudscraper.get(jikanEpisodesURL);
+  const data = await axios.get(jikanEpisodesURL);
   const body = JSON.parse(data).episodes;
   const promises = [];
 
@@ -358,7 +372,8 @@ const getAnimeEpisodesTitles = async(id) =>{
 };
 
 const getAnimeCharacters = async(id) =>{
-  const res = await cloudscraper(`${DETAIL_URL}${id}` , {method: 'GET'});
+  const res = await axios.get(`${DETAIL_URL}${id}`, {method: 'GET'});
+  if(res.status !== 200) throw new Error('Failed to fetch anime characters');
   const bodyId = await res;
   const $ = cheerio.load(bodyId);
   let malId;
@@ -369,7 +384,8 @@ const getAnimeCharacters = async(id) =>{
   });
 
   const jikanCharactersURL = `${JIKAN_URL}${malId}/characters_staff`;
-  const data = await cloudscraper.get(jikanCharactersURL);
+  const data = await axios.get(jikanCharactersURL);
+  if(data.status !== 200) throw new Error('Failed to fetch characters data');
   let body = JSON.parse(data).characters;
   if(typeof body === 'undefined') return null;
 
@@ -398,7 +414,7 @@ const getAnimeCharacters = async(id) =>{
   return Promise.all(characters);
 };
 
-module.exports = {
+export {
   latestEpisodesAdded,
   latestAnime,
   latestAnimeDetail,
@@ -414,4 +430,4 @@ module.exports = {
   getAnimeExtraInfo,
   getAnimeEpisodesTitles,
   getAnimeCharacters
-};
+}
