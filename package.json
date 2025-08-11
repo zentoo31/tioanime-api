@@ -4,8 +4,9 @@
   "description": "TioAnime API is a content provider of the latest in the world of anime with sub in Spanish and free, in addition to providing different complementary information. Using as a reference the websites tioanime.com and myanimelist.net, to extract the data and information.",
   "main": "./src/api.js",
   "types": "./types/api.d.ts",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon src/api.js"
+    "dev": ""
   },
   "keywords": [
     "tioanime",
@@ -21,13 +22,11 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.6",
-    "cloudscraper": "^4.6.0",
-    "nodemon": "^2.0.6",
-    "request": "^2.88.2"
+    "axios": "^1.11.0",
+    "cheerio": "^1.0.0-rc.12"
   },
   "devDependencies": {
-    "typescript": "^2.9.2"
+    "typescript": "^5.9.2"
   },
   "repository": {
     "type": "git",
